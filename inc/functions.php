@@ -14,25 +14,25 @@ function pr( $array ) {
 function api_call() {
 	$step1_args = [
 		'schemaVersion'           => 1.0,
-		'requestId'               => 'R17100517154423',
-		'timestamp'               => '1625657184',
+		'requestId'               => 'R17100517154555',
+		'timestamp'               => '1625671849355',
 		'channelName'             => 'WEB',
 		'serviceName'             => 'HPP_PURCHASE',
 		'serviceParams' => [
-			'storeId'                => '20001179',
-			'hppKey'                 => 'API-835711313AHX',
-			'merchantUid'            => 'M0910298',
-			'hppSuccessCallbackUrl'  => 'http://localhost/wc/waafi-success',
-			'hppFailureCallbackUrl'  => 'http://localhost/wc/waafi-error',
+			'storeId'                => '1000159',
+			'hppKey'                 => 'HPP-1062710944',
+			'merchantUid'            => 'M0910136',
+			'hppSuccessCallbackUrl'  => 'http://localhost/wc/',
+			'hppFailureCallbackUrl'  => 'http://localhost/wc/',
 			'hppRespDataFormat'      => 2,
-			'paymentMethod'          => 'CREDIT_CARD/MWALLET_ACCOUNT/MWALLET_BANKACCOUNT',
+			'paymentMethod'          => 'CREDIT_CARD',
 			'payerInfo' => [
-				'subscriptionId'        => '123456789'
+				'subscriptionId'        => '123456781'
 			],
 			'transactionInfo' => [
-				'referenceId'           => '102101asa',
-				'invoiceId'             => '125125ca',
-				'amount'                => 500.00,
+				'referenceId'           => 'wcwpg155',
+				'invoiceId'             => 'inv155',
+				'amount'                => 1500.00,
 				'currency'              => 'USD',
 				'description'           => 'Test Description',
 			],
@@ -40,7 +40,7 @@ function api_call() {
 	];
 
 	$step1_res = wp_remote_post(
-		'https://sandbox.safarifoneict.com/asm',
+		'https://stagingsandbox.safarifoneict.com/asm',
 		[
 			'headers'      => [ 'Content-Type' => 'application/json; charset=utf-8' ],
 			'body'         => wp_json_encode( $step1_args ),
@@ -51,17 +51,19 @@ function api_call() {
 		],
 	);
 
-	$code = wp_remote_retrieve_response_code( $step1_res );
-	$step1_data = json_decode( wp_remote_retrieve_body( $step1_res ) );
-	if ( 200 !== $code ) {
-		return (object) [ 'status' => 'error', 'data' => $step1_data ];
-	}
+	$code        = wp_remote_retrieve_response_code( $step1_res );
+	$step1_data  = json_decode( wp_remote_retrieve_body( $step1_res ) );
+	//pr($step1_data);
 
-	$hppurl = $step1_data['params']['hppUrl'];
-	$hpprequestid = $step1_data['params']['hppRequestId'];
-	$referenceid = $step1_data['params']['referenceId'];
+	$hppurl        = $step1_data->params->hppUrl;
+	$hpprequestid  = $step1_data->params->hppRequestId;
+	$referenceid   = $step1_data->params->referenceId;
 
 	$step2_args = [
+		'method'       => 'POST',
+		'timeout'      => 60,
+		'redirection'  => 5,
+		'blocking'     => true,
 		'body'        => [
 			'hppRequestId' => $hpprequestid,
 			'referenceId'  => $referenceid
@@ -69,15 +71,20 @@ function api_call() {
 	];
 
 	$response = wp_remote_post( $hppurl, $step2_args );
+	//unset($response['body']);
+	//pr($response);
+	return $response['body'];
 
-	// if( ! is_wp_error( $response ) ) {
-	// 	$code = wp_remote_retrieve_response_code( $response );
+	if ( ! is_wp_error( $response ) ) {
+		// return error message
+	}
 
-	// 	if (200 !== $code) {
-	// 		return (object) [ 'status' => 'error', 'message' => 'Response code is not 200' ];
-	// 	}
-	// }
+	//$code = wp_remote_retrieve_response_code( $response );
 
-	return (object) [ 'status' => 'success', 'data' => json_decode( wp_remote_retrieve_body( $response ) ) ];
+	if (200 !== $code) {
+		//return (object) [ 'status' => 'error', 'message' => 'Response code is not 200' ];
+	}
+
+	//return (object) [ 'status' => 'success', 'data' => json_decode( wp_remote_retrieve_body( $response ) ) ];
 }
 

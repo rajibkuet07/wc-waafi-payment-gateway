@@ -19,19 +19,26 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->init_settings();
 
 		// set the settings
-		$this->title        = $this->get_option( 'title' );
+		// Turn these settings into variables we can use
+		foreach ( $this->settings as $setting_key => $value ) {
+			$this->$setting_key = $value;
+		}
+		/* $this->title        = $this->get_option( 'title' );
 		$this->description  = $this->get_option( 'description' );
 		$this->enabled      = $this->get_option( 'enabled' );
 		$this->testmode     = 'yes' === $this->get_option( 'testmode' );
 		$this->merchant_uid = $this->get_option( 'merchant_uid' );
 		$this->store_id     = $this->get_option( 'store_id' );
 		$this->hpp_key      = $this->get_option( 'hpp_key' );
-		$this->instructions = $this->get_option( 'instructions' );
+		$this->instructions = $this->get_option( 'instructions' ); */
 
 		// process admin settings
 		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
 		}
+
+		// if Waafi Pay then display the payment info the receipt page
+		add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
 
 		// thankyou message
 		add_action( 'woocommerce_thankyou_' . $this->id, [ $this, 'thankyou_page' ] );
@@ -97,11 +104,20 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		];
 	}
 
+	public function receipt_page($order_id) {
+		$waafi_form = api_call();
+		echo <<<HTML
+		<div class="wcwpg-container">
+			$waafi_form
+		</div>
+		HTML;
+	}
+
 	/**
 	 * Handling payment and processing the order
 	 * also tells WC where to redirect the use
 	 *
-	 * @param int $order_id
+	 * @param int order id
 	 * @return array
 	 */
 	function process_payment( $order_id ) {
@@ -109,24 +125,23 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
     $order = wc_get_order( $order_id );
 
     // Mark as on-hold (we're awaiting the cheque)
-    $order->update_status( 'on-hold', __( 'Awaiting WaafiPay payment', 'wc-waafi-payment-gateway' ) );
+    //$order->update_status( 'on-hold', __( 'Awaiting WaafiPay payment', 'wc-waafi-payment-gateway' ) );
 
 		// process the api calls here
-		$api_res = api_call();
+		//api_call();
 
-		if ( $api_res->status === 'error' ) {
-			//wc_add_notice( $api_res->data );
-			die($api_res->data);
+		/* if ( $api_res->status === 'error' ) {
+			wc_add_notice( $api_res->message );
 			return;
-		}
+		} */
 
     // Remove cart
-    $woocommerce->cart->empty_cart();
+    //$woocommerce->cart->empty_cart();
 
     // Return thankyou redirect
     return array(
 			'result'   => 'success',
-			'redirect' => $this->get_return_url( $order )
+			'redirect' => $order->get_checkout_payment_url( true )
     );
 	}
 

@@ -24,5 +24,8 @@ define( 'WCWPG_VERSION', '1.0.0');
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+//WCWPG\api_call();
+
+
 // init plugin
 Plugin::init();

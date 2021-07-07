@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<script
+			type="text/javascript"
+			src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"
+		></script>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="stylesheet"
+			href="https://stagingsandbox.safarifoneict.com/resources/css/hppstyles_blue.css"
+			type="text/css"
+		/>
+	</head>
+
+	<body>
+		<!-- header bar -->
+		<header>
+			<h1>WaafiPay</h1>
+		</header>
+
+		<!-- information bar -->
+		<div class="menubar">... &nbsp;</div>
+		<!-- content -->
+		<div style="width: 100%">
+			<div style="background-color: #ffffff">
+				<div id="divcontent" style="display: block">
+					<div class="pContent" style="height: 30px">&nbsp;</div>
+					<form
+						id="pmtFrm"
+						name="pmtFrm"
+						method="POST"
+						action="https://stagingsandbox.safarifoneict.com/hpp/hppProcCardInfo"
+					>
+						<div
+							class="outerlayout"
+							style="
+								border-radius: 15px;
+								border: 2px solid #cdcdcd;
+								padding: 10px;
+							"
+						>
+							<div class="pContent" style="height: 30px">
+								Mandatory fields marked by *
+							</div>
+
+							<div class="header1">&nbsp; Payment details</div>
+
+							<div class="tabStrip">
+								<ul>
+									<li>
+										<a class="tabLinkActive" id="tabLink3">Credit card</a>
+									</li>
+								</ul>
+							</div>
+							<div class="tabContentActive" id="tabContent3">
+								<p class="pContent">
+									Please complete the following details exactly as they appear
+									on your card. Do not put spaces or hyphens in the
+									account/card/mobile number.
+								</p>
+								<div class="Rtable Rtable--2cols Rtable--collapse">
+									<div class="Rtable-cell" style="width: 20%">
+										<sup class="supclass1">*</sup
+										><span class="fieldLable">&nbsp;Card No</span>
+									</div>
+									<div class="Rtable-cell" style="text-align: left; width: 80%">
+										<input
+											type="text"
+											id="cardNo"
+											name="cardNo"
+											maxlength="20"
+											value=""
+										/>&nbsp;
+									</div>
+									<div class="Rtable-cell" style="width: 20%">
+										<sup class="supclass1">*</sup
+										><span class="fieldLable">&nbsp;CVC</span>
+									</div>
+									<div class="Rtable-cell" style="text-align: left; width: 80%">
+										<input
+											type="password"
+											id="cardCvc"
+											name="cardCvc"
+											maxlength="4"
+										/>&nbsp;
+									</div>
+
+									<div class="Rtable-cell" style="width: 20%">
+										<sup class="supclass1">*</sup
+										><span class="fieldLable">&nbsp;Exp.Date</span>
+									</div>
+									<div class="Rtable-cell" style="text-align: left; width: 80%">
+										<select name="expireMM" id="expireMM">
+											<option value="">Month</option>
+											<option value="01">January</option>
+											<option value="02">February</option>
+											<option value="03">March</option>
+											<option value="04">April</option>
+											<option value="05">May</option>
+											<option value="06">June</option>
+											<option value="07">July</option>
+											<option value="08">August</option>
+											<option value="09">September</option>
+											<option value="10">October</option>
+											<option value="11">November</option>
+											<option value="12">December</option>
+										</select>
+										<select name="expireYY" id="expireYY">
+											<option value="">Year</option>
+											<option value="18">2018</option>
+											<option value="19">2019</option>
+											<option value="20">2020</option>
+											<option value="21">2021</option>
+											<option value="22">2022</option>
+											<option value="23">2023</option>
+											<option value="24">2024</option>
+											<option value="25">2025</option>
+											<option value="26">2026</option>
+											<option value="27">2027</option>
+											<option value="28">2028</option>
+											<option value="29">2029</option>
+											<option value="30">2030</option>
+										</select>
+									</div>
+
+									<div class="Rtable-cell" style="width: 20%">
+										<sup class="supclass1">*</sup
+										><span class="fieldLable">&nbsp;First Name</span>
+									</div>
+									<div class="Rtable-cell" style="text-align: left; width: 80%">
+										<input
+											type="text"
+											id="cardholder_fname"
+											name="cardholder_fname"
+											value="#"
+										/>&nbsp;
+									</div>
+
+									<div class="Rtable-cell" style="width: 20%">
+										<sup class="supclass1">*</sup
+										><span class="fieldLable">&nbsp;Last Name</span>
+									</div>
+									<div class="Rtable-cell" style="text-align: left; width: 80%">
+										<input
+											type="text"
+											id="cardholder_lname"
+											name="cardholder_lname"
+											maxlength="20"
+										/>&nbsp;
+									</div>
+								</div>
+							</div>
+							<script type="text/javascript" language="javascript">
+								function doProcess() {
+									var pmtMethod = 3;
+
+									var accountHolder = ""; // name
+									var accountNo = ""; // cardno / mobileno / ...
+									var accountPin = ""; // card cvc / pin / ...
+									var accountExpDate = ""; // expdate
+
+									var fname = "";
+									var lname = "";
+									fname = document.getElementById("cardholder_fname").value;
+									lname = document.getElementById("cardholder_lname").value;
+									accountHolder =
+										document.getElementById("cardholder_fname").value +
+										" " +
+										document.getElementById("cardholder_lname").value;
+									accountNo = document.getElementById("cardNo").value;
+									accountPin = document.getElementById("cardCvc").value;
+
+									//                                        if(fname.length<2){
+									//                                            showAlertBox("Invalid first name");
+									//                                            return false;
+									//                                        }
+									//                                        if(lname.length<2){
+									//                                            showAlertBox("Invalid last name");
+									//                                            return false;
+									//                                        }
+									if (accountNo.length < 12) {
+										showAlertBox("Invalid cardno");
+										return false;
+									}
+									if (accountPin.length < 3) {
+										showAlertBox("Invalid card CVC/CVV ");
+										return false;
+									}
+
+									var expdate_mm = document.getElementById("expireMM").value;
+									var expdate_yy = document.getElementById("expireYY").value;
+									if (expdate_mm == "" || expdate_yy == "") {
+										showAlertBox("Invalid expirydate");
+										return false;
+									}
+									accountExpDate = expdate_mm + expdate_yy;
+
+									//showAlertBox(document.getElementById('expDate').value);
+									document.getElementById("accountHolder").value =
+										accountHolder;
+									document.getElementById("accountNo").value = accountNo;
+									document.getElementById("accountPin").value = accountPin;
+									document.getElementById("accountExpDate").value =
+										accountExpDate;
+
+									document.getElementById("PMID").value = pmtMethod;
+									document.getElementById("divcontent").style.display = "none";
+									document.getElementById("divloading").style.display = "block";
+									//waitingDialog.show('Custom message');setTimeout(function () {waitingDialog.hide();}, 2000);
+									//showPleaseWait();
+
+									return true;
+								}
+							</script>
+
+							<input type="hidden" name="orderId" value="16248978" />
+							<input
+								type="hidden"
+								name="submitStatus"
+								id="submitStatus"
+								value="1"
+							/>
+							<input type="hidden" name="PMID" id="PMID" value="3" />
+							<input type="hidden" name="accountHolder" id="accountHolder" />
+							<input type="hidden" name="accountNo" id="accountNo" />
+							<input type="hidden" name="accountPin" id="accountPin" />
+							<input type="hidden" name="accountExpDate" id="accountExpDate" />
+							<input
+								style="text-align: center; display: none"
+								type="submit"
+								id="btnTimeout"
+								value="#"
+								onclick="JavaScript:return doTimeout()"
+							/>
+
+							<div class="Rtable Rtable--3cols Rtable--collapse">
+								<div class="Rtable-cell" style="width: 25%">
+									<span class="fieldLable">&nbsp;MerchantUid</span>
+								</div>
+								<div class="Rtable-cell" style="width: 75%">
+									&nbsp;<span class="fieldValue">M0910136</span>&nbsp;
+								</div>
+								<div class="Rtable-cell" style="width: 25%">
+									<span class="fieldLable">&nbsp;MerchantName</span>
+								</div>
+								<div class="Rtable-cell" style="width: 75%">
+									&nbsp;<span class="fieldValue">Zakaria Barakat</span>&nbsp;
+								</div>
+								<div class="Rtable-cell" style="width: 25%">
+									<span class="fieldLable">&nbsp;Transaction Ref</span>
+								</div>
+								<div class="Rtable-cell" style="width: 75%">
+									&nbsp;<span class="fieldValue">16248978</span>&nbsp;
+								</div>
+
+								<div class="Rtable-cell" style="width: 25%">
+									<span class="fieldLable">&nbsp;Invoice</span>
+								</div>
+								<div class="Rtable-cell" style="width: 75%">
+									&nbsp;<span class="fieldValue">a125127</span>&nbsp;
+								</div>
+								<div class="Rtable-cell" style="width: 25%">
+									<span class="fieldLable">&nbsp;Amount</span>
+								</div>
+								<div class="Rtable-cell" style="width: 75%">
+									&nbsp;<span class="fieldValue">500.0 (USD)</span>&nbsp;
+								</div>
+								<div class="Rtable-cell" style="width: 25%">
+									<span class="fieldLable">&nbsp;Charges</span>
+								</div>
+								<div class="Rtable-cell" style="width: 75%">
+									&nbsp;<span class="fieldValue">0.0 (USD)</span>&nbsp;
+								</div>
+							</div>
+							<div>&nbsp;</div>
+
+							<p class="header1" style="font-size: smaller">
+								Click 'Process Transaction' to charge your card. Only click the
+								button once. Using the 'Back','Refresh' or 'Cancel' button after
+								you press the 'Process Transaction' button will not stop the
+								transaction from being processed and may result in a double
+								charge.
+							</p>
+							<div id="divAlertBox" class="alert" style="display: none">
+								<div class="closebtn" onclick="closeAlertBox()">&times;</div>
+								<div id="divAlertBoxMsg"></div>
+							</div>
+							<hr />
+							<div class="Rtable Rtable--2cols Rtable--collapse">
+								<div class="Rtable-cell" style="text-align: center">
+									<input
+										type="submit"
+										class="myProcButton"
+										id="btnProcess"
+										value="Process Transaction"
+										onclick="JavaScript:return doProcess()"
+									/>&nbsp;
+								</div>
+								<div class="Rtable-cell" style="text-align: center">
+									<input
+										type="submit"
+										class="myCancelButton"
+										id="btnCancel"
+										value="Cancel Transaction "
+										onclick="JavaScript:return doCancel()"
+									/>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<div id="divloading" style="display: none">
+					<img
+						id="loading-image"
+						src="/PaymentGateway/resources/loading1.gif;jsessionid=24F1A876BB602CF734D15B6EAA2124EB"
+						alt="Loading..."
+					/>
+				</div>
+
+				<script type="text/javascript" language="javascript">
+					///////////////////////////////////////
+
+					//used to fire the ontimeout event
+					window.onload = function () {
+						window.setTimeout(
+							'document.getElementById("btnTimeout").click()',
+							300000
+						);
+					};
+					function closeAlertBox() {
+						var x = document.getElementById("divAlertBox");
+						var msgdiv = document.getElementById("divAlertBoxMsg");
+						msgdiv.innerText = "";
+
+						x.style.display = "none";
+					}
+					function showAlertBox(str) {
+						var x = document.getElementById("divAlertBox");
+						x.style.display = "block";
+						var msgdiv = document.getElementById("divAlertBoxMsg");
+						//alert(msgdiv.innerText);
+						msgdiv.innerText = str;
+					}
+
+					function doCancel() {
+						document.getElementById("submitStatus").value = "0"; //pressed cancel button
+						return true;
+					}
+					function doTimeout() {
+						document.getElementById("submitStatus").value = "-1"; //pressed cancel button
+						return true;
+					}
+
+					//                                function counter(){
+					//                                    var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
+					//
+					//                                    // Update the count down every 1 second
+					//                                    var x = setInterval(function() {
+					//
+					//                                      // Get today's date and time
+					//                                      var now = new Date().getTime();
+					//
+					//                                      // Find the distance between now and the count down date
+					//                                      var distance = countDownDate - now;
+					//
+					//                                      // Time calculations for days, hours, minutes and seconds
+					//                                      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+					//                                      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+					//                                      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+					//                                      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+					//
+					//                                      // Display the result in the element with id="demo"
+					//                                      document.getElementById("demo").innerHTML = days + "d " + hours + "h "
+					//                                      + minutes + "m " + seconds + "s ";
+					//
+					//                                      // If the count down is finished, write some text
+					//                                      if (distance < 0) {
+					//                                        clearInterval(x);
+					//                                        document.getElementById("demo").innerHTML = "EXPIRED";
+					//                                      }
+					//                                    }, 1000);
+					//                                }
+
+					/**
+					 * Module for displaying "Waiting for..." dialog using Bootstrap
+					 *
+					 * @author Eugene Maslovich <ehpc@em42.ru>
+					 */
+
+					//                                   var waitingDialog = waitingDialog || (function ($) {
+					//                                       'use strict';
+					//
+					//                                           // Creating modal dialog's DOM
+					//                                           var $dialog = $(
+					//                                                   '<div class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true" style="padding-top:15%; overflow-y:visible;">' +
+					//                                                   '<div class="modal-dialog modal-m">' +
+					//                                                   '<div class="modal-content">' +
+					//                                                           '<div class="modal-header"><h3 style="margin:0;"></h3></div>' +
+					//                                                           '<div class="modal-body">' +
+					//                                                                   '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+					//                                                           '</div>' +
+					//                                                   '</div></div></div>');
+					//
+					//                                           return {
+					//                                                   /**
+					//                                                    * Opens our dialog
+					//                                                    * @param message Custom message
+					//                                                    * @param options Custom options:
+					//                                                    * 				  options.dialogSize - bootstrap postfix for dialog size, e.g. "sm", "m";
+					//                                                    * 				  options.progressType - bootstrap postfix for progress bar type, e.g. "success", "warning".
+					//                                                    */
+					//                                                   show: function (message, options) {
+					//                                                           // Assigning defaults
+					//                                                           if (typeof options === 'undefined') {
+					//                                                                   options = {};
+					//                                                           }
+					//                                                           if (typeof message === 'undefined') {
+					//                                                                   message = 'Loading';
+					//                                                           }
+					//                                                           var settings = $.extend({
+					//                                                                   dialogSize: 'm',
+					//                                                                   progressType: '',
+					//                                                                   onHide: null // This callback runs after the dialog was hidden
+					//                                                           }, options);
+					//
+					//                                                           // Configuring dialog
+					//                                                           $dialog.find('.modal-dialog').attr('class', 'modal-dialog').addClass('modal-' + settings.dialogSize);
+					//                                                           $dialog.find('.progress-bar').attr('class', 'progress-bar');
+					//                                                           if (settings.progressType) {
+					//                                                                   $dialog.find('.progress-bar').addClass('progress-bar-' + settings.progressType);
+					//                                                           }
+					//                                                           $dialog.find('h3').text(message);
+					//                                                           // Adding callbacks
+					//                                                           if (typeof settings.onHide === 'function') {
+					//                                                                   $dialog.off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
+					//                                                                           settings.onHide.call($dialog);
+					//                                                                   });
+					//                                                           }
+					//                                                           // Opening dialog
+					//                                                           $dialog.modal();
+					//                                                   },
+					//                                                   /**
+					//                                                    * Closes dialog
+					//                                                    */
+					//                                                   hide: function () {
+					//                                                           $dialog.modal('hide');
+					//                                                   }
+					//                                           };
+					//
+					//                                   })(jQuery);
+
+					/**
+					 * Displays overlay with "Please wait" text. Based on bootstrap modal. Contains animated progress bar.
+					 */
+					function showPleaseWait() {
+						if (document.querySelector("#pleaseWaitDialog") == null) {
+							var modalLoading =
+								'<div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false" role="dialog">\
+                                               <div class="modal-dialog">\
+                                                   <div class="modal-content">\
+                                                       <div class="modal-header">\
+                                                           <h4 class="modal-title">Please wait...</h4>\
+                                                       </div>\
+                                                       <div class="modal-body">\
+                                                           <div class="progress">\
+                                                             <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar"\
+                                                             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%; height: 40px">\
+                                                             </div>\
+                                                           </div>\
+                                                       </div>\
+                                                   </div>\
+                                               </div>\
+                                           </div>';
+							$(document.body).append(modalLoading);
+						}
+
+						$("#pleaseWaitDialog").modal("show");
+					}
+
+					/**
+					 * Hides "Please wait" overlay. See function showPleaseWait().
+					 */
+					function hidePleaseWait() {
+						$("#pleaseWaitDialog").modal("hide");
+					}
+				</script>
+			</div>
+		</div>
+		<div class="pContent" style="height: 30px">&nbsp;</div>
+		<!-- information bar -->
+		<div class="menubar">&nbsp;</div>
+	</body>
+</html>
