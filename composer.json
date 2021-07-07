@@ -1,0 +1,20 @@
+{
+	"name": "wcwpg/wc-waafi-payment-gateway",
+	"type": "wordpress-plugin",
+	"license": "GPL V2+",
+	"authors": [
+		{
+			"name": "Sisir K Adhikari",
+			"email": "sisir@codeware.io"
+		}
+	],
+	"require": {},
+	"autoload": {
+		"psr-4": {
+			"WCWPG\\": "inc"
+		},
+		"files": [
+			"inc/functions.php"
+		]
+	}
+}
