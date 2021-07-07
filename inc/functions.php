@@ -39,7 +39,17 @@ function api_call() {
 		],
 	];
 
-	$step1_res = wp_remote_post( 'https://sandbox.safarifoneict.com/asm', json_encode( $step1_args ) );
+	$step1_res = wp_remote_post(
+		'https://sandbox.safarifoneict.com/asm',
+		[
+			'headers'      => [ 'Content-Type' => 'application/json; charset=utf-8' ],
+			'body'         => wp_json_encode( $step1_args ),
+			'method'       => 'POST',
+			'timeout'      => 60,
+			'redirection'  => 5,
+			'blocking'     => true,
+		],
+	);
 
 	$code = wp_remote_retrieve_response_code( $step1_res );
 	$step1_data = json_decode( wp_remote_retrieve_body( $step1_res ) );
@@ -52,10 +62,10 @@ function api_call() {
 	$referenceid = $step1_data['params']['referenceId'];
 
 	$step2_args = [
-		'body'        => array(
+		'body'        => [
 			'hppRequestId' => $hpprequestid,
 			'referenceId'  => $referenceid
-		),
+		],
 	];
 
 	$response = wp_remote_post( $hppurl, $step2_args );
