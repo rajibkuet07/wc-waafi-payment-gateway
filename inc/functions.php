@@ -14,8 +14,8 @@ function pr( $array ) {
 function api_call() {
 	$step1_args = [
 		'schemaVersion'           => 1.0,
-		'requestId'               => 'R17100517154555',
-		'timestamp'               => '1625671849355',
+		'requestId'               => 'R17100517154655',
+		'timestamp'               => '1625671859055',
 		'channelName'             => 'WEB',
 		'serviceName'             => 'HPP_PURCHASE',
 		'serviceParams' => [
@@ -30,8 +30,8 @@ function api_call() {
 				'subscriptionId'        => '123456781'
 			],
 			'transactionInfo' => [
-				'referenceId'           => 'wcwpg155',
-				'invoiceId'             => 'inv155',
+				'referenceId'           => 'wcwpg255',
+				'invoiceId'             => 'inv255',
 				'amount'                => 1500.00,
 				'currency'              => 'USD',
 				'description'           => 'Test Description',

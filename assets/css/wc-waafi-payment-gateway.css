@@ -1,0 +1,404 @@
+.wcwpg-container {
+	width: 100%;
+	display: block;
+}
+
+iframe.waafi-pay {
+	width: 100%;
+	height: 100vh;
+	display: block;
+	border: 2px solid #ddd;
+}
+
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 27, 2019, 11:51:04 AM
+    Author     : Safarifone
+*/
+
+body {
+	margin: 0px;
+	padding: 0;
+	height: 100%;
+	font-family: "verdana";
+	background-color: #ffffff;
+}
+.wcwpg-container header {
+	background: #336699;
+	color: white;
+	height: 60px;
+	padding: 10px;
+}
+
+.wcwpg-container footer {
+	background: #aaa;
+	color: white;
+}
+
+.menubar {
+	background: #eee;
+	padding: 5px;
+}
+.header1 {
+	font-family: "verdana";
+	background: #336699;
+	color: white;
+	padding: 10px;
+}
+
+/* Variables
+================================== */
+/* Tables
+================================== */
+
+.Rtable {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin: 0 0 0 0;
+	padding: 0;
+}
+.Rtable-cell1 {
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-box-flex: 1;
+	-ms-flex-positive: 1;
+	flex-grow: 1;
+	width: 100%;
+	padding: 0.2em 0.2em;
+	overflow: hidden;
+	list-style: none;
+	border: solid 0px white;
+	background: rgba(112, 128, 144, 0.2);
+}
+.Rtable-cell {
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-box-flex: 1;
+	-ms-flex-positive: 1;
+	flex-grow: 1;
+	width: 100%;
+	padding: 0.2em 0.2em;
+	overflow: hidden;
+	list-style: none;
+	border: solid 0px white;
+	background: rgba(112, 128, 144, 0.2);
+}
+
+.Rtable-cell > h1,
+.Rtable-cell > h2,
+.Rtable-cell > h3,
+.Rtable-cell > h4,
+.Rtable-cell > h5,
+.Rtable-cell > h6 {
+	margin: 0;
+}
+/* Table column sizing
+================================== */
+.Rtable--2cols > .Rtable-cell {
+	width: 50%;
+}
+.Rtable--3cols > .Rtable-cell {
+	width: 33.33%;
+}
+.Rtable--4cols > .Rtable-cell {
+	width: 25%;
+}
+.Rtable--5cols > .Rtable-cell {
+	width: 20%;
+}
+.Rtable--6cols > .Rtable-cell {
+	width: 16.6%;
+}
+/* Page styling
+================================== */
+html {
+	height: 100%;
+	background-color: #ffffff;
+}
+.outerlayout {
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+
+	min-height: 100%;
+	margin: 0 auto;
+	padding: 0em;
+	max-width: 700px;
+	font-family: "verdana", sans-serif;
+
+	background-color: white;
+	border: 0px #dedede solid;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-top: 0;
+}
+h3 {
+	font-size: 1.2em;
+}
+h4 {
+	font-size: 1em;
+}
+strong {
+	color: #434d57;
+}
+/* Apply styles
+================================== */
+.Rtable {
+	position: relative;
+	top: 1px;
+	left: 1px;
+}
+.Rtable-cell {
+	background-color: white;
+	border-color: #e2e6e9;
+	color: #336699;
+}
+
+/* Cell styles
+================================== */
+.Rtable-cell--dark {
+	background-color: slategrey;
+	border-color: #5a6673;
+	color: white;
+}
+.Rtable-cell--dark > h1,
+.Rtable-cell--dark > h2,
+.Rtable-cell--dark > h3,
+.Rtable-cell--dark > h4,
+.Rtable-cell--dark > h5,
+.Rtable-cell--dark > h6 {
+	color: white;
+}
+.Rtable-cell--medium {
+	background-color: #b8c0c8;
+	border-color: #a9b3bc;
+}
+.Rtable-cell--light {
+	background-color: white;
+	border-color: #e2e6e9;
+}
+.Rtable-cell--highlight {
+	background-color: lightgreen;
+	border-color: #64e764;
+}
+.Rtable-cell--alert {
+	background-color: darkorange;
+	border-color: #cc7000;
+	color: white;
+}
+.Rtable-cell--alert > h1,
+.Rtable-cell--alert > h2,
+.Rtable-cell--alert > h3,
+.Rtable-cell--alert > h4,
+.Rtable-cell--alert > h5,
+.Rtable-cell--alert > h6 {
+	color: white;
+}
+.Rtable-cell--head {
+	background-color: slategrey;
+	border-color: #5a6673;
+	color: white;
+}
+.Rtable-cell--head > h1,
+.Rtable-cell--head > h2,
+.Rtable-cell--head > h3,
+.Rtable-cell--head > h4,
+.Rtable-cell--head > h5,
+.Rtable-cell--head > h6 {
+	color: white;
+}
+.Rtable-cell--foot {
+	background-color: #b8c0c8;
+	border-color: #a9b3bc;
+}
+/* Responsive
+==================================== */
+@media all and (max-width: 500px) {
+	.Rtable--collapse {
+		display: block;
+	}
+	.Rtable--collapse > .Rtable-cell {
+		width: 100% !important;
+	}
+	.Rtable--collapse > .Rtable-cell--foot {
+		margin-bottom: 1em;
+	}
+}
+.no-flexbox .Rtable {
+	display: block;
+}
+.no-flexbox .Rtable > .Rtable-cell {
+	width: 100%;
+}
+.no-flexbox .Rtable > .Rtable-cell--foot {
+	margin-bottom: 1em;
+}
+
+.trHeight {
+	height: 30px;
+}
+.fieldLable {
+	font-family: verdana;
+	font-size: 12px;
+	font-weight: bold;
+}
+.fieldValue {
+	font-family: verdana;
+	font-size: small;
+	font-style: bold;
+	text-align: left;
+	color: #000000;
+}
+.pContent {
+	font-family: arial;
+	font-size: 10px;
+}
+
+.myProcButton {
+	background-color: #44c767;
+	border-radius: 4px;
+	border: 1px solid #18ab29;
+	display: inline-block;
+	cursor: pointer;
+	color: #ffffff;
+	font-family: Arial;
+	font-size: 15px;
+	padding: 6px 15px;
+	text-decoration: none;
+	width: 80%;
+}
+.myProcButton:hover {
+	background-color: #5cbf2a;
+}
+.myProcButton:active {
+	position: relative;
+	top: 1px;
+}
+
+.myCancelButton {
+	background-color: #ff0000;
+	border-radius: 4px;
+	border: 1px solid #ff0000;
+	display: inline-block;
+	cursor: pointer;
+	color: #ffffff;
+	font-family: Arial;
+	font-size: 15px;
+	padding: 6px 15px;
+	text-decoration: none;
+	width: 80%;
+}
+.myCancelButton:hover {
+	background-color: #ff3333;
+}
+.myCancelButton:active {
+	position: relative;
+	top: 1px;
+}
+
+/* for tabs
+==================================== */
+.tabStrip {
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+	background-color: #cdcdcd;
+	color: #ff3333;
+}
+.tabStrip ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+.tabStrip li {
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+	background-color: #cdcdcd;
+	margin: 0 2px 0 0;
+	list-style-type: none;
+	float: left;
+}
+.tabLink {
+	display: block;
+	text-decoration: none;
+	padding: 5px;
+	background: #e8e8e8;
+	border: #dadada solid;
+	border-width: 1px 1px 0 1px;
+	color: #8a8a8a;
+	font-family: Arial;
+}
+.tabLinkActive {
+	display: block;
+	text-decoration: none;
+
+	border-radius: 15px 15px 0px 0px;
+	border-width: 1px 1px 0 1px;
+	padding: 10px;
+	color: #336699;
+	background: #e0e0e0;
+
+	font-family: verdena ariel;
+	font-size: large;
+	text-alignment: center;
+}
+.tabContent {
+	display: none;
+}
+.tabContentActive {
+	display: block;
+	clear: both;
+	background: #ffffff;
+	border: 1px #dedede solid;
+	padding: 10px;
+}
+
+.alert {
+	padding: 20px;
+	background-color: #f44336;
+	color: white;
+	opacity: 1;
+	transition: opacity 0.6s;
+	margin-bottom: 15px;
+}
+
+.alert.success {
+	background-color: #4caf50;
+}
+.alert.info {
+	background-color: #2196f3;
+}
+.alert.warning {
+	background-color: #ff9800;
+}
+
+.closebtn {
+	margin-left: 15px;
+	color: white;
+	font-weight: bold;
+	float: right;
+	font-size: 22px;
+	line-height: 20px;
+	cursor: pointer;
+	transition: 0.3s;
+}
+
+.closebtn:hover {
+	color: black;
+}
+
+.supclass1 {
+	color: red;
+}
+
+/*//////for please wait dialog/////////*/

@@ -4,6 +4,13 @@ namespace WCWPG;
 
 class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 	/**
+	 * Wc Api callback
+	 *
+	 * @var string
+	 */
+	public $api_callback = 'waafi-callback';
+
+	/**
 	 * Constructor of the WC_Waafi_Payment_Gateway class
 	 */
 	public function __construct() {
@@ -17,20 +24,17 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		// laod settings
 		$this->init_form_fields();
 		$this->init_settings();
-
-		// set the settings
-		// Turn these settings into variables we can use
+		
+		// turn these settings into variables we can use
 		foreach ( $this->settings as $setting_key => $value ) {
 			$this->$setting_key = $value;
 		}
-		/* $this->title        = $this->get_option( 'title' );
-		$this->description  = $this->get_option( 'description' );
-		$this->enabled      = $this->get_option( 'enabled' );
-		$this->testmode     = 'yes' === $this->get_option( 'testmode' );
-		$this->merchant_uid = $this->get_option( 'merchant_uid' );
-		$this->store_id     = $this->get_option( 'store_id' );
-		$this->hpp_key      = $this->get_option( 'hpp_key' );
-		$this->instructions = $this->get_option( 'instructions' ); */
+		$this->merchant = $this->testmode ? $this->sandbox_merchant_uid : $this->merchant_uid;
+		$this->store    = $this->testmode ? $this->sandbox_store_id : $this->store_id;
+		$this->hpp      = $this->testmode ? $this->sandbox_hpp_key : $this->hpp_key;
+
+		// logger
+		$this->log = new \WC_Logger();
 
 		// process admin settings
 		if ( current_user_can( 'manage_options' ) ) {
@@ -40,11 +44,14 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		// if Waafi Pay then display the payment info the receipt page
 		add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
 
-		// thankyou message
-		add_action( 'woocommerce_thankyou_' . $this->id, [ $this, 'thankyou_page' ] );
+		// process the api response from waafi
+		add_action( 'woocommerce_api_' . $this->api_callback, [ $this, 'waafi_response' ] );
 
 		// customer Emails
 		add_action( 'woocommerce_email_before_order_table', [ $this, 'email_instructions' ], 10, 3 );
+
+		// thankyou message
+		add_action( 'woocommerce_thankyou_' . $this->id, [ $this, 'thankyou_page' ] );
 	}
 
 	/**
@@ -73,6 +80,67 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
         'default' 		=> '',
 				'description' => __( 'This controls the description which the user sees during checkout.', 'wc-waafi-payment-gateway' ),
 			],
+			'invoice_prefix' => [
+				'title'       => __( 'Prefix for the invoice id', 'wc-waafi-payment-gateway' ),
+				'type'        => 'text',
+				'description' => __( 'Alphanumeric prefix for this store.', 'wc-waafi-payment-gateway' ),
+				'default'     => 'wcwpg-',
+			],
+			'ref_prefix' => [
+				'title'       => __( 'Prefix for the referrence id', 'wc-waafi-payment-gateway' ),
+				'type'        => 'text',
+				'description' => __( 'Alphanumeric prefix for this store.', 'wc-waafi-payment-gateway' ),
+				'default'     => 'wcwpg-',
+			],
+			'instructions' => [
+				'title'       => __( 'Instructions', 'wc-waafi-payment-gateway' ),
+				'type'        => 'textarea',
+				'description' => __( 'Instructions that will be added to the thank you page and emails.', 'wc-waafi-payment-gateway'),
+				'default'     => '',
+			],
+			'sandbox_api_info'	=> [
+				'title'       => __( 'Test Mode API Details', 'wc-waafi-payment-gateway' ),
+				'type'        => 'title',
+				'description' => __( 'Add the API credentials to process payment on test mode.', 'wc-waafi-payment-gateway' ),
+			],
+			'testmode' => [
+				'title'       => __( 'Test mode', 'wc-waafi-payment-gateway' ),
+				'label'       => __( 'Enable Test Mode', 'wc-waafi-payment-gateway' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Place the payment gateway in test mode using sandbox.', 'wc-waafi-payment-gateway' ),
+				'default'     => 'yes',
+			],
+			'payment_method' 		=> [
+				'title' 			=> __( 'Payment Method', 'wc-waafi-payment-gateway' ),
+				'type' 				=> 'select',
+				'description' => __( 'Select the payment type for your shop.', 'wc-waafi-payment-gateway' ),
+				'options' 		=> [
+					'CREDIT_CARD'          => 'Credit Card',
+					'MWALLET_ACCOUNT'      => 'MFS Transactions',
+					'MWALLET_BANKACCOUNT'  => 'MFS Customer\'s Bank Account',
+				],
+				'default' => 'CREDIT_CARD',
+			],
+			'sandbox_merchant_uid' => [
+				'title'       => __( 'Test Mode Marchant Uid', 'wc-waafi-payment-gateway' ),
+				'type'        => 'text',
+				'description' => __( 'Marchant Uid for this Waafi account.', 'wc-waafi-payment-gateway' ),
+			],
+			'sandbox_store_id' => [
+				'title'       => __( 'Test Mode Store ID', 'wc-waafi-payment-gateway' ),
+				'type'        => 'text',
+				'description' => __( 'Alphanumeric unique ID for this store.', 'wc-waafi-payment-gateway' ),
+			],
+			'sandbox_hpp_key' => [
+				'title'       => __( 'Test Mode HPP Key', 'wc-waafi-payment-gateway' ),
+				'type'        => 'text',
+				'description' => __( 'Alphanumeric unique HPP key for this store.', 'wc-waafi-payment-gateway' ),
+			],
+			'live_api_info'	=> [
+				'title'       => __( 'Live API Details', 'wc-waafi-payment-gateway' ),
+				'type'        => 'title',
+				'description' => __( 'Add the API credentials to process payment on live.', 'wc-waafi-payment-gateway' ),
+			],
 			'merchant_uid' => [
 				'title'       => __( 'Marchant Uid', 'wc-waafi-payment-gateway' ),
 				'type'        => 'text',
@@ -88,29 +156,7 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 				'type'        => 'text',
 				'description' => __( 'Alphanumeric unique HPP key for this store.', 'wc-waafi-payment-gateway' ),
 			],
-			'testmode' => [
-				'title'       => __( 'Test mode', 'wc-waafi-payment-gateway' ),
-				'label'       => __( 'Enable Test Mode', 'wc-waafi-payment-gateway' ),
-				'type'        => 'checkbox',
-				'description' => __( 'Place the payment gateway in test mode using sandbox.', 'wc-waafi-payment-gateway' ),
-				'default'     => 'yes',
-			],
-			'instructions' => [
-				'title'       => __( 'Instructions', 'wc-waafi-payment-gateway' ),
-				'type'        => 'textarea',
-				'description' => __( 'Instructions that will be added to the thank you page and emails.', 'wc-waafi-payment-gateway'),
-				'default'     => '',
-			],
 		];
-	}
-
-	public function receipt_page($order_id) {
-		$waafi_form = api_call();
-		echo <<<HTML
-		<div class="wcwpg-container">
-			$waafi_form
-		</div>
-		HTML;
 	}
 
 	/**
@@ -121,28 +167,126 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	function process_payment( $order_id ) {
-    global $woocommerce;
     $order = wc_get_order( $order_id );
 
-    // Mark as on-hold (we're awaiting the cheque)
-    //$order->update_status( 'on-hold', __( 'Awaiting WaafiPay payment', 'wc-waafi-payment-gateway' ) );
-
-		// process the api calls here
-		//api_call();
-
-		/* if ( $api_res->status === 'error' ) {
-			wc_add_notice( $api_res->message );
-			return;
-		} */
-
-    // Remove cart
-    //$woocommerce->cart->empty_cart();
-
-    // Return thankyou redirect
+    // Return to the checkout payment page to take payment
     return array(
 			'result'   => 'success',
 			'redirect' => $order->get_checkout_payment_url( true )
     );
+	}
+
+	/**
+	 * Receipt page to take payment using WaafiPay payment
+	 *
+	 * @param int $order_id
+	 * @return void
+	 */
+	public function receipt_page( $order_id ) {
+		Enqueue::enqueue( [ 'wc-waafi-payment-gateway' ], 'style' );
+
+		// API interaction
+		$api          = new API( $this );
+		$api_response = $api->initiate_payment( $order_id );
+		//pr($api_response);
+
+		if ( $api_response->status === 'error' ) {
+			$content = $api_response->message;
+		} else {
+			$content = $api_response->data;
+		}
+
+		$body = '<p>Pay using WaafiPay</p>';
+		if ( preg_match( '/(?:<body[^>]*>)(.*)<\/body>/isU', $content, $matches ) ) {
+			$body = $matches[1];
+		}
+
+		// print the waafipay payment form
+		echo <<<HTML
+			<div class="wcwpg-container" id="wcwpg-container">$body</div>
+		HTML;
+		// echo '<div class="wcwpg-container" id="wcwpg-container">
+		// 	<iframe
+		// 		class="waafi-pay"
+		// 		srcdoc="' . esc_html( $content ) . '"
+		// 		allowpaymentrequest=true
+		// 		allowfullscreen=true
+		// 	></iframe>
+		// </div>';
+	}
+
+	/**
+	 * Process the response from the waafipay payment gateway
+	 *
+	 * @param int $order_id
+	 * @return void
+	 */
+	public function waafi_response() {
+		global $wpdb;
+
+		if ( empty( $_REQUEST ) ) {
+			wp_die( 'WaafiPay Payment Request Failure', 'WaafiPay', array( 'response' => 500 ) );
+		}
+		
+		$this->log->add( $this->id, 'Response from WaafiPay: ' . print_r( wc_clean( $_REQUEST ), true ) );
+
+		if ( ! isset( $_REQUEST['state'] ) || wc_clean( $_REQUEST['state'] ) == 'FAILED' ) {
+			$message = isset( $_REQUEST['responseMsg'] ) ? wc_clean( $_REQUEST['responseMsg'] ) : '';
+			wc_add_notice(
+				sprintf( __( 'Failed to compete the payment. Error: %s', 'wc-waafi-payment-gateway'), $message ),
+				'error'
+			);
+			wp_redirect( wc_get_checkout_url() );
+			exit;
+		}
+		
+		$order_id       = 0;
+		$referrence_id  = wc_clean( $_REQUEST['referenceId'] );
+
+		// get the order using the referrence id
+		$post_meta      = $wpdb->get_row(
+			$wpdb->prepare(
+				"select post_id from {$wpdb->postmeta} where meta_key = '_wcwpg_reference_id' and meta_value = '%s'",
+				$referrence_id
+			),
+			ARRAY_A
+		);
+
+		if ( is_array( $post_meta ) && isset( $post_meta['post_id'] ) && $post_meta['post_id'] ) {
+			$order_id = $post_meta['post_id'];
+		}
+
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order_id || ! $order ) {
+			$this->log->add( $this->id, 'Error: order not found.' . print_r( $order_id, true ) );
+			wc_add_notice( __( 'Order not found in the payment response.', 'wc-waafi-payment-gateway') , 'error' );
+			wp_redirect( wc_get_checkout_url() );
+			exit;
+		}
+
+		if ( $_REQUEST['responseMsg'] == 'Success' && $_REQUEST['state'] == 'APPROVED' ) {
+			// add some meta
+			update_post_meta( $order_id, '_wcwpg_transaction_id', wc_clean( $_REQUEST['transactionId'] ) );
+			update_post_meta( $order_id, '_wcwpg_card_no', wc_clean( $_REQUEST['cardNo'] ) );
+			update_post_meta( $order_id, '_wcwpg_card_holder', wc_clean( $_REQUEST['cardHolder'] ) );
+			update_post_meta( $order_id, '_wcwpg_card_exp_date', wc_clean( $_REQUEST['cardExpDate'] ) );
+			update_post_meta( $order_id, '_wcwpg_proc_description', wc_clean( $_REQUEST['procDescription'] ) );
+
+			// payment complete and clean the cart
+			$order->payment_complete();
+			WC()->cart->empty_cart();
+
+			$order->add_order_note( sprintf( __( 'Payment was successfully processed by WaafiPay.', 'wc-waafi-payment-gateway' ) ) );
+		} else {
+			$order->update_status( 'failed' );
+			$order->add_order_note( sprintf( __( 'Error Message: %s', 'wc-waafi-payment-gateway' ), wc_clean( $_REQUEST['responseMsg'] ) ) );
+		}
+
+		// finally redirect to the thank you page
+		$redirect = $this->get_return_url( $order );
+		wp_redirect( $redirect );
+		exit;
 	}
 
 	/**
