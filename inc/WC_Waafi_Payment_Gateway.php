@@ -41,9 +41,6 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
 		}
 
-		// if Waafi Pay then display the payment info the receipt page
-		add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
-
 		// process the api response from waafi
 		add_action( 'woocommerce_api_' . $this->api_callback, [ $this, 'waafi_response' ] );
 
@@ -169,48 +166,24 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 	function process_payment( $order_id ) {
     $order = wc_get_order( $order_id );
 
-    // Return to the checkout payment page to take payment
-    return array(
-			'result'   => 'success',
-			'redirect' => $order->get_checkout_payment_url( true )
-    );
-	}
-
-	/**
-	 * Receipt page to take payment using WaafiPay payment
-	 *
-	 * @param int $order_id
-	 * @return void
-	 */
-	public function receipt_page( $order_id ) {
-		Enqueue::enqueue( [ 'wc-waafi-payment-gateway' ], 'style' );
-
 		// API interaction
 		$api          = new API( $this );
 		$api_response = $api->initiate_payment( $order_id );
 
 		if ( $api_response->status === 'error' ) {
-			$content = $api_response->message;
+			if ( ! $this->is_rest_api ) {
+				wc_add_notice( $api_response->message, 'error' );
+				return;
+			}
 		} else {
-			$content = $api_response->data;
+			$api_url = $api_response->url;
 		}
 
-		if ( preg_match( '/(?:<body[^>]*>)(.*)<\/body>/isU', $content, $matches ) ) {
-			$content = $matches[1];
-		}
-
-		// print the waafipay payment form
-		echo <<<HTML
-			<div class="wcwpg-container" id="wcwpg-container">$content</div>
-		HTML;
-		// echo '<div class="wcwpg-container" id="wcwpg-container">
-		// 	<iframe
-		// 		class="waafi-pay"
-		// 		srcdoc="' . esc_html( $content ) . '"
-		// 		allowpaymentrequest=true
-		// 		allowfullscreen=true
-		// 	></iframe>
-		// </div>';
+    // Return to the checkout payment page to take payment
+    return array(
+			'result'   => 'success',
+			'redirect' => $api_url
+    );
 	}
 
 	/**
@@ -263,7 +236,7 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 			exit;
 		}
 
-		if ( $_REQUEST['responseMsg'] == 'Success' && $_REQUEST['state'] == 'APPROVED' ) {
+		if ( $_REQUEST['responseMsg'] == 'RCS_SUCCESS' && $_REQUEST['state'] == 'APPROVED' ) {
 			// add some meta
 			update_post_meta( $order_id, '_wcwpg_transaction_id', wc_clean( $_REQUEST['transactionId'] ) );
 			update_post_meta( $order_id, '_wcwpg_card_no', wc_clean( $_REQUEST['cardNo'] ) );

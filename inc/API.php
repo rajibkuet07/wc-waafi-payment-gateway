@@ -67,32 +67,12 @@ class API {
 
 		// Step 2
 		// populate the waafi pay payment form
-		$hppurl       = $auth_response->params->hppUrl;
-		$hpprequestid = $auth_response->params->hppRequestId;
-		$referenceid  = $auth_response->params->referenceId;
-		
-		$form_generate_request = wp_remote_post(
-			$hppurl,
-			[
-				'method'        => 'POST',
-				'timeout'       => 60,
-				'redirection'   => 5,
-				'blocking'      => true,
-				'body'        => [
-					'hppRequestId' => $hpprequestid,
-					'referenceId'  => $referenceid
-				],
-			],
-		);
+		$api_url = add_query_arg( [
+			'hppRequestId' => $auth_response->params->hppRequestId,
+			'referenceId'  => $auth_response->params->referenceId,
+		], $auth_response->params->hppUrl );
 
-		$code     = wp_remote_retrieve_response_code( $form_generate_request );
-		$response = wp_remote_retrieve_body( $form_generate_request );
-
-		if ( 200 !== $code ) {
-			return (object) [ 'status' => 'error', 'message' => __( 'There is some problem in the server. Sorry for the inconvenience!', 'wc-waafi-payment-gateway' ) ];
-		}
-
-		return (object) [ 'status' => 'success', 'data' => $response ];
+		return (object) [ 'status' => 'success', 'url' => $api_url ];
 	}
 
 	/**
@@ -119,8 +99,8 @@ class API {
 				'storeId'               => $gateway->store,
 				'hppKey'                => $gateway->hpp,
 				'merchantUid'           => $gateway->merchant,
-				'hppSuccessCallbackUrl' => $this->callback_url( $order_id ),
-				'hppFailureCallbackUrl' => $this->callback_url( $order_id ),
+				'hppSuccessCallbackUrl' => $this->callback_url( $order ),
+				'hppFailureCallbackUrl' => $this->callback_url( $order ),
 				'hppRespDataFormat'     => 2,
 				'paymentMethod'         => $gateway->payment_method, // todo: add form field for customer
 				'payerInfo'             => [],
@@ -141,14 +121,12 @@ class API {
 	 * Callback url to return after payment
 	 * returning a special url to trigger an action to process the data
 	 *
-	 * @param int $order_id
+	 * @param object $order
 	 * @return void
 	 */
-	private function callback_url( $order_id ) {
+	private function callback_url( $order ) {
 		return home_url( '/wc-api/' . $this->gateway->api_callback );
-		/* return add_query_arg( array(
-			'wc-api' => $this->gateway->api_callback,
-			'order'  => $order_id,
-		), home_url( '/' ) ); */
+		//return $this->gateway->get_return_url( $order );
+		//return str_replace( 'https:', 'http:', home_url( '/wc-api/' . $this->gateway->api_callback ) );
 	}
 }

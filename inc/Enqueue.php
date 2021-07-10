@@ -8,15 +8,7 @@ class Enqueue{
         self::localize();
     }
 
-    public static function register() {
-			wp_register_style(
-				'wc-waafi-payment-gateway',
-				WCWPG_URL . '/assets/css/wc-waafi-payment-gateway.css',
-				[],
-				'1.0.0',
-				'all'
-			);
-    }
+    public static function register() {}
 
     public static function localize() {}
 
