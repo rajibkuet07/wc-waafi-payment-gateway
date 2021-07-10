@@ -188,7 +188,6 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		// API interaction
 		$api          = new API( $this );
 		$api_response = $api->initiate_payment( $order_id );
-		//pr($api_response);
 
 		if ( $api_response->status === 'error' ) {
 			$content = $api_response->message;
@@ -196,14 +195,13 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 			$content = $api_response->data;
 		}
 
-		$body = '<p>Pay using WaafiPay</p>';
 		if ( preg_match( '/(?:<body[^>]*>)(.*)<\/body>/isU', $content, $matches ) ) {
-			$body = $matches[1];
+			$content = $matches[1];
 		}
 
 		// print the waafipay payment form
 		echo <<<HTML
-			<div class="wcwpg-container" id="wcwpg-container">$body</div>
+			<div class="wcwpg-container" id="wcwpg-container">$content</div>
 		HTML;
 		// echo '<div class="wcwpg-container" id="wcwpg-container">
 		// 	<iframe

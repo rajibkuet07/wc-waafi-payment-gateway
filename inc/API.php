@@ -61,7 +61,7 @@ class API {
 		$code           = wp_remote_retrieve_response_code( $auth_request );
 		$auth_response  = json_decode( wp_remote_retrieve_body( $auth_request ) );
 
-		if ( 200 !== $code || $auth_response->params == new \stdClass() ) {
+		if ( 200 !== $code || empty( (array) $auth_response->params ) ) {
 			return (object) [ 'status' => 'error', 'message' => __( 'There is some problem in the server. Sorry for the inconvenience!', 'wc-waafi-payment-gateway' ) ];
 		}
 
