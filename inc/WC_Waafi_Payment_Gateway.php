@@ -29,9 +29,9 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		foreach ( $this->settings as $setting_key => $value ) {
 			$this->$setting_key = $value;
 		}
-		$this->merchant = $this->testmode ? $this->sandbox_merchant_uid : $this->merchant_uid;
-		$this->store    = $this->testmode ? $this->sandbox_store_id : $this->store_id;
-		$this->hpp      = $this->testmode ? $this->sandbox_hpp_key : $this->hpp_key;
+		$this->merchant = $this->testmode == 1 ? $this->sandbox_merchant_uid : $this->merchant_uid;
+		$this->store    = $this->testmode == 1 ? $this->sandbox_store_id : $this->store_id;
+		$this->hpp      = $this->testmode == 1 ? $this->sandbox_hpp_key : $this->hpp_key;
 
 		// logger
 		$this->log = new \WC_Logger();
