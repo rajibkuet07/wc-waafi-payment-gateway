@@ -204,7 +204,7 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( ! isset( $_REQUEST['state'] ) || wc_clean( $_REQUEST['state'] ) == 'FAILED' ) {
 			$message = isset( $_REQUEST['responseMsg'] ) ? wc_clean( $_REQUEST['responseMsg'] ) : '';
 			wc_add_notice(
-				sprintf( __( 'Failed to compete the payment. Error: %s', 'wc-waafi-payment-gateway'), $message ),
+				sprintf( __( 'Failed to complete the payment. Error: %s', 'wc-waafi-payment-gateway'), $message ),
 				'error'
 			);
 			wp_redirect( wc_get_checkout_url() );
