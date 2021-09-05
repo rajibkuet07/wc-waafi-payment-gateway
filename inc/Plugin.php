@@ -9,7 +9,9 @@ class Plugin{
 			add_action( 'wp_enqueue_scripts', [ 'WCWPG\Enqueue', 'init' ] );
 
 			add_filter( 'woocommerce_payment_gateways', [ 'WCWPG\Plugin', 'add_waafi_payment_gateway_class' ] );
-    }
+
+			add_filter( 'ibuy_rest_gateway', [ __NAMESPACE__, 'rest_gateway' ], 10, 2);
+		}
 
 		public static function on_activation() {
 			// Make sure that woocommerce is activated
@@ -24,5 +26,13 @@ class Plugin{
 		public static function add_waafi_payment_gateway_class( $methods ) {
 			$methods[] = 'WCWPG\WC_Waafi_Payment_Gateway';
    		return $methods;
+		}
+
+		public static function rest_gateway( $gateway, $gateway_id ) {
+			if ( $gateway_id !== 'wcwpg' ) {
+				return $gateway;
+			}
+
+			return new WC_Waafi_Payment_Gateway();
 		}
 }

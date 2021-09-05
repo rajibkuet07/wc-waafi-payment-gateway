@@ -164,7 +164,7 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	function process_payment( $order_id ) {
-    $order = wc_get_order( $order_id );
+    $order = \wc_get_order( $order_id );
 
 		// API interaction
 		$api          = new API( $this );
@@ -172,7 +172,7 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 
 		if ( $api_response->status === 'error' ) {
 			if ( ! $this->is_rest_api ) {
-				wc_add_notice( $api_response->message, 'error' );
+				\wc_add_notice( $api_response->message, 'error' );
 				return;
 			}
 		} else {
@@ -184,6 +184,13 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 			'result'   => 'success',
 			'redirect' => $api_url
     );
+	}
+
+	public function get_transaction_url( $order ) {
+		$sandbox    = $this->testmode ? 'sandbox' : 'api';
+		$invoice_id = get_post_meta($order->get_id(), '_edahab_invoice', true);
+
+		return "https://edahab.net/$sandbox/payment?invoiceId=" . $invoice_id;
 	}
 
 	/**
