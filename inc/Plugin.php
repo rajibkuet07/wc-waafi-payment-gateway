@@ -10,7 +10,7 @@ class Plugin{
 
 			add_filter( 'woocommerce_payment_gateways', [ 'WCWPG\Plugin', 'add_waafi_payment_gateway_class' ] );
 
-			add_filter( 'ibuy_rest_gateway', [ __NAMESPACE__, 'rest_gateway' ], 10, 2);
+			add_filter( 'ibuy_rest_gateway', [ __CLASS__, 'rest_gateway' ], 10, 2);
 		}
 
 		public static function on_activation() {
