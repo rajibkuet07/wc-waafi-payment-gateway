@@ -20,6 +20,7 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->has_fields         = false;
 		$this->method_title       = __( 'WaafiPay', 'wc-waafi-payment-gateway' );
 		$this->method_description = __( 'Take payments using Waafi Pay Hosted Pay Page.', 'wc-waafi-payment-gateway' );
+		$this->is_rest_api 				= defined('REST_REQUEST') && REST_REQUEST;
 
 		// laod settings
 		$this->init_form_fields();
@@ -174,6 +175,8 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 			if ( ! $this->is_rest_api ) {
 				\wc_add_notice( $api_response->message, 'error' );
 				return;
+			} else {
+				return new \WP_Error( 422, $api_response->message, ['status' => 422] );
 			}
 		} else {
 			$api_url = $api_response->url;
@@ -184,13 +187,6 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 			'result'   => 'success',
 			'redirect' => $api_url
     );
-	}
-
-	public function get_transaction_url( $order ) {
-		$sandbox    = $this->testmode ? 'sandbox' : 'api';
-		$invoice_id = get_post_meta($order->get_id(), '_edahab_invoice', true);
-
-		return "https://edahab.net/$sandbox/payment?invoiceId=" . $invoice_id;
 	}
 
 	/**
