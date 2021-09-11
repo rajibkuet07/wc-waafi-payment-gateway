@@ -4,11 +4,11 @@ namespace WCWPG;
 
 class Plugin{
     public static function init() {
-			register_activation_hook( WCWPG_FILE, [ 'WCWPG\Plugin', 'on_activation' ] );
+			register_activation_hook( WCWPG_FILE, [ __CLASS__, 'on_activation' ] );
 
-			add_action( 'wp_enqueue_scripts', [ 'WCWPG\Enqueue', 'init' ] );
+			add_action( 'wp_enqueue_scripts', [ __NAMESPACE__ . '\Enqueue', 'init' ] );
 
-			add_filter( 'woocommerce_payment_gateways', [ 'WCWPG\Plugin', 'add_waafi_payment_gateway_class' ] );
+			add_filter( 'woocommerce_payment_gateways', [ __CLASS__, 'add_waafi_payment_gateway_class' ] );
 
 			add_filter( 'ibuy_rest_gateway', [ __CLASS__, 'rest_gateway' ], 10, 2);
 		}
