@@ -25,8 +25,8 @@ class API {
 	 */
 	public function __construct( $gateway ) {
 		$this->gateway = $gateway;
-		
-		$this->api_url = $this->gateway->testmode == 1
+
+		$this->api_url = $this->gateway->testmode === 'yes'
 			? 'https://stagingsandbox.safarifoneict.com/asm'
 			: 'https://api.waafi.com/asm';
 	}
