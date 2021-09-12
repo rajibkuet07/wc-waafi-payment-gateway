@@ -25,7 +25,7 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		// laod settings
 		$this->init_form_fields();
 		$this->init_settings();
-		
+
 		// turn these settings into variables we can use
 		foreach ( $this->settings as $setting_key => $value ) {
 			$this->$setting_key = $value;
@@ -201,21 +201,30 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( empty( $_REQUEST ) ) {
 			wp_die( 'WaafiPay Payment Request Failure', 'WaafiPay', array( 'response' => 500 ) );
 		}
-		
-		$this->log->add( $this->id, 'Response from WaafiPay: ' . print_r( wc_clean( $_REQUEST ), true ) );
 
-		if ( ! isset( $_REQUEST['state'] ) || wc_clean( $_REQUEST['state'] ) == 'FAILED' ) {
-			$message = isset( $_REQUEST['responseMsg'] ) ? wc_clean( $_REQUEST['responseMsg'] ) : '';
-			wc_add_notice(
+		$this->log->add( $this->id, 'Response from WaafiPay: ' . print_r( \wc_clean( $_REQUEST ), true ) );
+
+		if ( ! isset( $_REQUEST['state'] ) || \wc_clean( $_REQUEST['state'] ) == 'FAILED' ) {
+			$message = isset( $_REQUEST['responseMsg'] ) ? \wc_clean( $_REQUEST['responseMsg'] ) : '';
+			\wc_add_notice(
 				sprintf( __( 'Failed to complete the payment. Error: %s', 'wc-waafi-payment-gateway'), $message ),
 				'error'
 			);
-			wp_redirect( wc_get_checkout_url() );
+
+			wp_redirect(
+				add_query_arg(
+					[
+						'state'   => $_REQUEST['state'],
+						'message' => $message,
+					],
+					wc_get_checkout_url()
+				)
+			);
 			exit;
 		}
-		
+
 		$order_id       = 0;
-		$referrence_id  = wc_clean( $_REQUEST['referenceId'] );
+		$referrence_id  = \wc_clean( $_REQUEST['referenceId'] );
 
 		// get the order using the referrence id
 		$post_meta      = $wpdb->get_row(
@@ -235,7 +244,16 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( ! $order_id || ! $order ) {
 			$this->log->add( $this->id, 'Error: order not found.' . print_r( $order_id, true ) );
 			wc_add_notice( __( 'Order not found in the payment response.', 'wc-waafi-payment-gateway') , 'error' );
-			wp_redirect( wc_get_checkout_url() );
+
+			wp_redirect(
+				add_query_arg(
+					[
+						'state'   => 'error',
+						'message' => __( 'Order not found in the payment response.', 'wc-waafi-payment-gateway'),
+					],
+					wc_get_checkout_url()
+				)
+			);
 			exit;
 		}
 
@@ -258,7 +276,13 @@ class WC_Waafi_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		// finally redirect to the thank you page
-		$redirect = $this->get_return_url( $order );
+		$redirect = add_query_arg(
+			[
+				'state'   => $_REQUEST['state'],
+				'message' => $_REQUEST['responseMsg'],
+			],
+			$this->get_return_url( $order )
+		);
 		wp_redirect( $redirect );
 		exit;
 	}
